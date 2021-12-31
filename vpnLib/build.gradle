@@ -1,7 +1,10 @@
-apply plugin: 'maven'
-group = 'com.github.nizwar'
+
 
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
+
+group = 'com.github.nizwar'
+
 android {
     compileSdkVersion 30
 
@@ -11,6 +14,8 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+
+        ndkVersion "21.0.6113669"
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
