@@ -323,12 +323,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
             nbuilder.setContentTitle(getString(R.string.notifcation_title_notconnect));
 
         Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getApplicationContext().getPackageName());
-        PendingIntent pendingIntent = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, launchIntent, PendingIntent.FLAG_IMMUTABLE);
-        }else{
-            pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, launchIntent, 0);
-        }
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, launchIntent, PendingIntent.FLAG_IMMUTABLE);
 
         nbuilder.setContentText(msg);
         nbuilder.setOnlyAlertOnce(true);
@@ -447,7 +442,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         intent.putExtra("need", needed);
         Bundle b = new Bundle();
         b.putString("need", needed);
-        PendingIntent pIntent = PendingIntent.getActivity(this, 12, intent, 0);
+        PendingIntent pIntent = PendingIntent.getActivity(this, 12, intent, PendingIntent.FLAG_IMMUTABLE);
         return pIntent;
     }
 
@@ -460,7 +455,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
         intent.putExtra("PAGE", "graph");
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        PendingIntent startLW = PendingIntent.getActivity(this, 0, intent, 0);
+        PendingIntent startLW = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         return startLW;
 
@@ -1374,7 +1369,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
         // updateStateString trigger the notification of the VPN to be refreshed, save this intent
         // to have that notification also this intent to be set
-        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         VpnStatus.updateStateString("USER_INPUT", "waiting for user input", reason, LEVEL_WAITING_FOR_USER_INPUT, intent);
         nbuilder.setContentIntent(pIntent);
 
