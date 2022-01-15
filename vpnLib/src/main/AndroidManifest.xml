@@ -9,10 +9,12 @@
 
     <application>
         <activity android:name=".VPNHelper"
+            android:export="true"
             tools:ignore="Instantiatable" />
         <!-- Begin Activity by ics-openvpn -->
         <service
             android:name=".core.OpenVPNService"
+            android:export="true"
             android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
@@ -22,6 +24,7 @@
         <activity
             android:name=".LaunchVPN"
             android:excludeFromRecents="true"
+            android:export="true"
             android:label="@string/vpn_launch_title"
             android:theme="@android:style/Theme.DeviceDefault.Light.Panel">
             <intent-filter>
@@ -34,6 +37,7 @@
             android:name=".DisconnectVPNActivity"
             android:excludeFromRecents="true"
             android:noHistory="true"
+            android:export="true"
             android:taskAffinity=".DisconnectVPN"
             android:theme="@style/blinkt.dialog" />
     </application>
