@@ -50,7 +50,7 @@ public class VPNHelper extends Activity {
         LocalBroadcastManager.getInstance(activity).registerReceiver(broadcastReceiver, new IntentFilter("connectionState"));
     }
 
-    private void startVPN() {
+    public void startVPN() {
         if (!vpnStart) connect();
     }
 
