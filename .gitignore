@@ -13,4 +13,5 @@
 .externalNativeBuild
 .cxx
 
-
+/gradlew.bat
+/gradlew

@@ -1,22 +1,15 @@
-
-
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
-
 group = 'com.github.nizwar'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
 
     defaultConfig {
-        minSdkVersion 16
-        //noinspection OldTargetApi
-        targetSdkVersion 30
+        minSdkVersion 16 
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
-
         ndkVersion "22.1.7171670"
-
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
     }
