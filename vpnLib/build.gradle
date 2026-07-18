@@ -8,7 +8,7 @@ android {
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"
-        ndkVersion "22.1.7171670"
+        ndkVersion "28.0.13004108"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
     }
