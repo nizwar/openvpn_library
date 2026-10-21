@@ -38,7 +38,7 @@ public class OpenVpnApi {
             vp.mProfileCreator = context.getPackageName();
             vp.mUsername = username;
             vp.mPassword = password;
-            if(bypassPackages.size() > 0){
+            if (bypassPackages != null && !bypassPackages.isEmpty()) {
                 vp.mAllowAppVpnBypass = true;
                 vp.mAllowedAppsVpn = new HashSet<>(bypassPackages);
             }

@@ -125,7 +125,9 @@ public class OpenVPNThread implements Runnable {
     }
 
     public static boolean stop() {
-        mService.openvpnStopped();
+        // Both are only set once a VPN was started in this process.
+        if (mService != null)
+            mService.openvpnStopped();
         if (mProcess != null)
             mProcess.destroy();
         return true;
