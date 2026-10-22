@@ -164,6 +164,8 @@ public class VpnProfile implements Serializable, Cloneable {
     private int mProfileVersion;
 
     public boolean mBlockUnusedAddressFamilies =true;
+    /** When the VPN disconnects on its own (milliseconds since 1970), 0 for never. */
+    public long mExpireAt = 0;
 
     public VpnProfile(String name) {
         mUuid = UUID.randomUUID();

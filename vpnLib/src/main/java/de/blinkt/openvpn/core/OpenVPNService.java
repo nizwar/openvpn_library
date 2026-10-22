@@ -56,6 +56,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Vector;
@@ -105,6 +106,9 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     // channel id is "" there, and startForeground() rejects a notification id of 0.
     private static final int NOTIFICATION_ID_NO_CHANNEL = 0x0bad;
     private String mForegroundChannel;
+    /** How often an armed session end is checked while no traffic flows. */
+    private static final long EXPIRY_CHECK_INTERVAL_MS = 15_000;
+    private final Runnable mExpiryCheck = this::checkExpiry;
     private final Vector<String> mDnslist = new Vector<>();
     private final NetworkSpace mRoutes = new NetworkSpace();
     private final NetworkSpace mRoutesv6 = new NetworkSpace();
@@ -304,6 +308,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         synchronized (mProcessLock) {
             mProcessThread = null;
         }
+        if (guiHandler != null)
+            guiHandler.removeCallbacks(mExpiryCheck);
         VpnStatus.removeByteCountListener(this);
         unregisterDeviceStateReceiver();
         ProfileManager.setConntectedVpnProfileDisconnected(this);
@@ -658,6 +664,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         }
 
 
+        armExpiry();
+
         /* start the OpenVPN process itself in a background thread */
         new Thread(this::startOpenVPN).start();
 
@@ -666,6 +674,31 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         VpnStatus.setConnectedVPNProfile(mProfile.getUUIDString());
 
         return START_STICKY;
+    }
+
+    private void armExpiry() {
+        guiHandler.removeCallbacks(mExpiryCheck);
+        if (mProfile != null && mProfile.mExpireAt > 0)
+            guiHandler.post(mExpiryCheck);
+    }
+
+    /**
+     * Ends the session at mProfile.mExpireAt. Compares with the wall clock, which
+     * keeps counting while the device sleeps; handler delays alone would not.
+     */
+    private void checkExpiry() {
+        guiHandler.removeCallbacks(mExpiryCheck);
+        if (mProfile == null || mProfile.mExpireAt <= 0)
+            return;
+        long remaining = mProfile.mExpireAt - System.currentTimeMillis();
+        if (remaining > 0) {
+            guiHandler.postDelayed(mExpiryCheck, Math.min(remaining, EXPIRY_CHECK_INTERVAL_MS));
+            return;
+        }
+        VpnStatus.logInfo("Session expired, disconnecting");
+        ProfileManager.setConntectedVpnProfileDisconnected(this);
+        if (mManagement != null)
+            mManagement.stopVPN(false);
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
@@ -1104,7 +1137,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
             }
         }
 
-        for (String pkg : mProfile.mAllowedAppsVpn) {
+        // Iterate over a copy: packages that are not installed are removed below.
+        for (String pkg : new HashSet<>(mProfile.mAllowedAppsVpn)) {
             try {
                 if (mProfile.mAllowedAppsVpnAreDisallowed) {
                     builder.addDisallowedApplication(pkg);
@@ -1327,6 +1361,9 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     @Override
     public void updateByteCount(long in, long out, long diffIn, long diffOut) {
         TotalTraffic.calcTraffic(this, in, out, diffIn, diffOut);
+        if (guiHandler != null && mProfile != null && mProfile.mExpireAt > 0
+                && System.currentTimeMillis() >= mProfile.mExpireAt)
+            guiHandler.post(mExpiryCheck);
         if (mDisplayBytecount) {
             if (mShowByteCountInNotification) {
                 String netstat = String.format(getString(R.string.statusline_bytecount),

@@ -792,7 +792,13 @@ public class OpenVpnManagementThread implements Runnable, OpenVPNManagement {
         boolean stopSucceed = stopOpenVPN();
         if (stopSucceed) {
             mShuttingDown = true;
-
+            if (!replaceConnection) {
+                // The management connection is closed right away, so OpenVPN's own
+                // EXITING state is never read: announce the deliberate stop, so that
+                // listeners can tell it from OpenVPN exiting on an error.
+                VpnStatus.updateStateString("EXITING", "SIGINT", R.string.state_exiting,
+                        ConnectionStatus.LEVEL_NOTCONNECTED);
+            }
         }
         return stopSucceed;
     }

@@ -94,6 +94,9 @@ public class VpnStatus {
                 // Return only the assigned IP addresses in the UI
                 if (parts.length >= 7)
                     message = String.format(Locale.US, "%s %s", parts[1], parts[6]);
+                else if (parts.length >= 2)
+                    // OpenVPN 2.6+ leaves out the empty IPv6 field.
+                    message = parts[1];
                 break;
         }
 
